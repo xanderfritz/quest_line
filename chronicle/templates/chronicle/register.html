@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block title %}register{% endblock %}
+{% block content %}
+  <h1>register</h1>
+  <p class="meta">pick a role. reader to browse and subscribe, journalist to write, editor to approve.</p>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button class="btn" type="submit">create account</button>
+  </form>
+{% endblock %}

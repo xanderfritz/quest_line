@@ -1,0 +1,51 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}quest line{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'chronicle/styles.css' %}" />
+</head>
+<body>
+  <header>
+    <a class="brand" href="{% url 'home' %}">quest line</a>
+    <a href="{% url 'home' %}">home</a>
+    <a href="{% url 'newsletter_list' %}">newsletters</a>
+    {% if user.is_authenticated %}
+      {% if user.role == 'journalist' %}
+        <a href="{% url 'my_articles' %}">my articles</a>
+        <a href="{% url 'article_create' %}">new article</a>
+        <a href="{% url 'newsletter_create' %}">new newsletter</a>
+      {% endif %}
+      {% if user.role == 'editor' %}
+        <a href="{% url 'editor_queue' %}">review queue</a>
+      {% endif %}
+      {% if user.role == 'reader' %}
+        <a href="{% url 'subscriptions' %}">subscriptions</a>
+      {% endif %}
+      <span class="who">{{ user.username }} ({{ user.role }})</span>
+      <a href="{% url 'logout' %}">logout</a>
+    {% else %}
+      <a href="{% url 'login' %}">login</a>
+      <a href="{% url 'register' %}">register</a>
+    {% endif %}
+  </header>
+
+  {% if messages %}
+    <ul class="flash">
+      {% for m in messages %}
+        <li class="flash-{{ m.tags }}">{{ m }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer>
+    <p>quest line - dark fantasy news</p>
+  </footer>
+</body>
+</html>

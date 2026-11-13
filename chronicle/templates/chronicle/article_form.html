@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block title %}new article{% endblock %}
+{% block content %}
+  <h1>new article</h1>
+  <p class="meta">your draft will go to the review queue for an editor to approve.</p>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button class="btn" type="submit">submit</button>
+  </form>
+{% endblock %}

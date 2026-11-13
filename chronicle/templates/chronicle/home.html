@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block title %}quest line - home{% endblock %}
+{% block content %}
+  <div class="hero">
+    <h1>quest line</h1>
+    <p class="meta">news from the dark realms</p>
+  </div>
+  <h2>latest articles</h2>
+  <ul class="scroll-grid">
+    {% for a in articles %}
+      <li class="scroll-card">
+        <h3><a href="{% url 'article_detail' pk=a.pk %}">{{ a.title }}</a></h3>
+        <p class="meta">
+          by {{ a.author.username }}
+          {% if a.publisher %}- {{ a.publisher.name }}{% else %}- independent{% endif %}
+        </p>
+        <p>{{ a.content|truncatewords:28 }}</p>
+      </li>
+    {% empty %}
+      <p>no articles yet.</p>
+    {% endfor %}
+  </ul>
+{% endblock %}

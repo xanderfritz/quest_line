@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block title %}{{ article.title }}{% endblock %}
+{% block content %}
+  <article class="article">
+    <h1>
+      {{ article.title }}
+      {% if article.approved %}<span class="tag tag-approved">approved</span>{% else %}<span class="tag tag-pending">pending</span>{% endif %}
+    </h1>
+    <p class="meta">
+      by {{ article.author.username }}
+      {% if article.publisher %}- {{ article.publisher.name }}{% else %}- independent{% endif %}
+      - {{ article.created_at|date:"d M Y" }}
+    </p>
+    <div class="content">{{ article.content }}</div>
+  </article>
+  <p><a class="btn" href="{% url 'home' %}">back</a></p>
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block title %}my articles{% endblock %}
+{% block content %}
+  <h1>my articles</h1>
+  <a class="btn" href="{% url 'article_create' %}">new article</a>
+  <table>
+    <tr><th>title</th><th>status</th><th>date</th></tr>
+    {% for a in articles %}
+      <tr>
+        <td><a href="{% url 'article_detail' pk=a.pk %}">{{ a.title }}</a></td>
+        <td>
+          {% if a.approved %}<span class="tag tag-approved">approved</span>{% else %}<span class="tag tag-pending">pending</span>{% endif %}
+        </td>
+        <td class="meta">{{ a.created_at|date:"d M Y" }}</td>
+      </tr>
+    {% empty %}
+      <tr><td colspan="3">you have not written anything yet</td></tr>
+    {% endfor %}
+  </table>
+{% endblock %}

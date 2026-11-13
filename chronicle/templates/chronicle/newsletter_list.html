@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block title %}newsletters{% endblock %}
+{% block content %}
+  <h1>newsletters</h1>
+  <ul class="scroll-grid">
+    {% for n in newsletters %}
+      <li class="scroll-card">
+        <h3><a href="{% url 'newsletter_detail' pk=n.pk %}">{{ n.title }}</a></h3>
+        <p class="meta">by {{ n.author.username }}</p>
+        <p>{{ n.description|truncatewords:28 }}</p>
+      </li>
+    {% empty %}
+      <p>no newsletters yet.</p>
+    {% endfor %}
+  </ul>
+{% endblock %}

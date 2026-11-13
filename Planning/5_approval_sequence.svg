@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="560" font-family="Arial" font-size="13">
+  <rect width="900" height="560" fill="#ffffff"/>
+  <text x="450" y="28" text-anchor="middle" font-size="18" font-weight="bold">article approval - sequence diagram</text>
+
+  <!-- lifelines -->
+  <g>
+    <rect x="30" y="55" width="110" height="30" fill="#f3e9d0" stroke="black"/>
+    <text x="85" y="75" text-anchor="middle">editor</text>
+    <line x1="85" y1="85" x2="85" y2="530" stroke="black" stroke-dasharray="4"/>
+
+    <rect x="180" y="55" width="110" height="30" fill="#f3e9d0" stroke="black"/>
+    <text x="235" y="75" text-anchor="middle">approve view</text>
+    <line x1="235" y1="85" x2="235" y2="530" stroke="black" stroke-dasharray="4"/>
+
+    <rect x="330" y="55" width="110" height="30" fill="#f3e9d0" stroke="black"/>
+    <text x="385" y="75" text-anchor="middle">Article model</text>
+    <line x1="385" y1="85" x2="385" y2="530" stroke="black" stroke-dasharray="4"/>
+
+    <rect x="480" y="55" width="110" height="30" fill="#f3e9d0" stroke="black"/>
+    <text x="535" y="75" text-anchor="middle">post_save signal</text>
+    <line x1="535" y1="85" x2="535" y2="530" stroke="black" stroke-dasharray="4"/>
+
+    <rect x="630" y="55" width="110" height="30" fill="#f3e9d0" stroke="black"/>
+    <text x="685" y="75" text-anchor="middle">email backend</text>
+    <line x1="685" y1="85" x2="685" y2="530" stroke="black" stroke-dasharray="4"/>
+
+    <rect x="780" y="55" width="110" height="30" fill="#f3e9d0" stroke="black"/>
+    <text x="835" y="75" text-anchor="middle">/api/approved/</text>
+    <line x1="835" y1="85" x2="835" y2="530" stroke="black" stroke-dasharray="4"/>
+  </g>
+
+  <!-- arrows -->
+  <g>
+    <line x1="85" y1="120" x2="230" y2="120" stroke="black" marker-end="url(#arrow)"/>
+    <text x="157" y="115" text-anchor="middle">click approve</text>
+
+    <line x1="235" y1="155" x2="380" y2="155" stroke="black" marker-end="url(#arrow)"/>
+    <text x="307" y="150" text-anchor="middle">article.approved = True; save()</text>
+
+    <line x1="385" y1="195" x2="530" y2="195" stroke="black" marker-end="url(#arrow)"/>
+    <text x="457" y="190" text-anchor="middle">post_save fires</text>
+
+    <text x="535" y="230" text-anchor="middle" font-style="italic">check prev approved != new</text>
+
+    <line x1="535" y1="265" x2="680" y2="265" stroke="black" marker-end="url(#arrow)"/>
+    <text x="607" y="260" text-anchor="middle">send email to subscribers</text>
+
+    <line x1="680" y1="300" x2="540" y2="300" stroke="black" marker-end="url(#arrow)" stroke-dasharray="3"/>
+    <text x="610" y="295" text-anchor="middle">sent</text>
+
+    <line x1="535" y1="340" x2="830" y2="340" stroke="black" marker-end="url(#arrow)"/>
+    <text x="682" y="335" text-anchor="middle">requests.post(json=article data)</text>
+
+    <line x1="830" y1="375" x2="540" y2="375" stroke="black" marker-end="url(#arrow)" stroke-dasharray="3"/>
+    <text x="685" y="370" text-anchor="middle">200 OK (logged)</text>
+
+    <line x1="380" y1="420" x2="240" y2="420" stroke="black" marker-end="url(#arrow)" stroke-dasharray="3"/>
+    <text x="310" y="415" text-anchor="middle">save complete</text>
+
+    <line x1="230" y1="455" x2="90" y2="455" stroke="black" marker-end="url(#arrow)"/>
+    <text x="160" y="450" text-anchor="middle">302 redirect to queue</text>
+
+    <text x="450" y="500" text-anchor="middle" font-style="italic" fill="#555">if the save was already approved, the signal short circuits - no email, no post</text>
+  </g>
+
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="black"/>
+    </marker>
+  </defs>
+</svg>

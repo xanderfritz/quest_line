@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block title %}subscriptions{% endblock %}
+{% block content %}
+  <h1>subscriptions</h1>
+  <p class="meta">pick the publishers and journalists you want to follow. you will be emailed when an article you follow is approved.</p>
+  <form method="post">
+    {% csrf_token %}
+    <h2>publishers</h2>
+    {% for p in publishers %}
+      <label>
+        <input type="checkbox" name="publishers" value="{{ p.id }}" {% if p.id in my_pubs %}checked{% endif %} />
+        {{ p.name }}
+      </label>
+    {% empty %}
+      <p class="meta">no publishers yet</p>
+    {% endfor %}
+
+    <h2>journalists</h2>
+    {% for j in journalists %}
+      <label>
+        <input type="checkbox" name="journalists" value="{{ j.id }}" {% if j.id in my_jours %}checked{% endif %} />
+        {{ j.username }}
+      </label>
+    {% empty %}
+      <p class="meta">no journalists yet</p>
+    {% endfor %}
+
+    <br><br>
+    <button class="btn" type="submit">save</button>
+  </form>
+{% endblock %}

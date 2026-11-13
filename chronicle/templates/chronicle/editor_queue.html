@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block title %}review queue{% endblock %}
+{% block content %}
+  <h1>review queue</h1>
+  <p class="meta">articles waiting to be approved.</p>
+  <table>
+    <tr><th>title</th><th>author</th><th>publisher</th><th>actions</th></tr>
+    {% for a in articles %}
+      <tr>
+        <td><a href="{% url 'article_detail' pk=a.pk %}">{{ a.title }}</a></td>
+        <td>{{ a.author.username }}</td>
+        <td>{{ a.publisher.name|default:"independent" }}</td>
+        <td>
+          <a class="btn" href="{% url 'article_approve' pk=a.pk %}">approve</a>
+          <a class="btn btn-danger" href="{% url 'article_delete' pk=a.pk %}">delete</a>
+        </td>
+      </tr>
+    {% empty %}
+      <tr><td colspan="4">nothing to review.</td></tr>
+    {% endfor %}
+  </table>
+{% endblock %}
