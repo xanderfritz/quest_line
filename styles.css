@@ -1,0 +1,78 @@
+/* quest line - simple dark fantasy styles */
+
+body {
+    background-color: #1a1510;
+    color: #d0c4a3;
+    font-family: Georgia, serif;
+    margin: 0;
+}
+
+header {
+    background-color: #0d0b08;
+    color: #c9a961;
+    padding: 15px 20px;
+    border-bottom: 2px solid #c9a961;
+}
+
+header a {
+    color: #c9a961;
+    text-decoration: none;
+    margin-right: 15px;
+}
+
+header a:hover {
+    text-decoration: underline;
+}
+
+.brand {
+    font-size: 22px;
+    font-weight: bold;
+    margin-right: 30px;
+}
+
+main {
+    max-width: 1000px;
+    margin: 20px auto;
+    padding: 20px;
+}
+
+footer {
+    text-align: center;
+    padding: 20px;
+    color: #8a7444;
+    border-top: 1px solid #3a2e22;
+    margin-top: 40px;
+}
+
+h1, h2, h3 {
+    color: #c9a961;
+}
+
+.hero {
+    text-align: center;
+    padding: 30px 0;
+    border-bottom: 1px solid #3a2e22;
+    margin-bottom: 20px;
+}
+
+.card-list {
+    list-style: none;
+    padding: 0;
+}
+
+.card {
+    background-color: #241c15;
+    border: 1px solid #3a2e22;
+    padding: 15px;
+    margin-bottom: 15px;
+}
+
+.card h3 {
+    margin-top: 0;
+}
+
+.meta {
+    color: #8a7444;
+    font-size: 14px;
+    font-style: italic;
+}
