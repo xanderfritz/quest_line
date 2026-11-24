@@ -1,9 +1,20 @@
+"""App config for the chronicle app.
+
+Wires up the post_migrate hook that seeds the Reader, Editor and
+Journalist groups with the right permissions, and loads the signals module.
+"""
+
 from django.apps import AppConfig
 from django.db.models.signals import post_migrate
 
 
-# runs after migrate - makes sure the three groups exist with the right perms
 def create_groups(sender, **kwargs):
+    """Seed the three role-based groups with their permissions.
+
+    Called via post_migrate so the groups always exist after a migration.
+    """
+    # runs after migrate - makes sure the three groups exist with the right perms
+
     from django.contrib.auth.models import Group, Permission
     from django.contrib.contenttypes.models import ContentType
     from .models import Article, Newsletter
@@ -38,10 +49,13 @@ def create_groups(sender, **kwargs):
 
 
 class ChronicleConfig(AppConfig):
+    """Chronicle app configuration."""
+
     default_auto_field = 'django.db.models.BigAutoField'
     name = 'chronicle'
 
     def ready(self):
+        """Register post_migrate and import signal handlers on app ready."""
         # hook the group setup into migrate
         post_migrate.connect(create_groups, sender=self)
         # importing signals here makes them register
