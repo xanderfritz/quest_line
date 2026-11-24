@@ -1,9 +1,20 @@
+"""Database models for the chronicle app.
+
+Defines the custom User, Publisher, Article and Newsletter models that
+power the quest_line news platform.
+"""
+
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 
-# my custom user, has a role
 class User(AbstractUser):
+    """Custom user model with a role field.
+
+    :cvar str role: One of READER, EDITOR or JOURNALIST. Controls what
+        the user can do in the app.
+    """
+
     READER = 'reader'
     EDITOR = 'editor'
     JOURNALIST = 'journalist'
@@ -31,6 +42,10 @@ class User(AbstractUser):
     # journalists use user.articles and user.newsletters (reverse FK)
 
     def save(self, *args, **kwargs):
+        """Save the user. If role is not reader, clear any reader subscriptions.
+
+        :raises django.db.DatabaseError: If the underlying save fails.
+        """
         # if not a reader, clear the reader subs
         super().save(*args, **kwargs)
         if self.role != self.READER and self.pk:
@@ -39,6 +54,12 @@ class User(AbstractUser):
 
 
 class Publisher(models.Model):
+    """A publisher that groups editors and journalists.
+
+    Articles can optionally belong to a publisher. Editors can approve
+    their publisher's articles and journalists write for that publisher.
+    """
+
     name = models.CharField(max_length=120)
     description = models.TextField(blank=True)
     editors = models.ManyToManyField(
@@ -59,6 +80,12 @@ class Publisher(models.Model):
 
 
 class Article(models.Model):
+    """A news article written by a journalist.
+
+    :cvar bool approved: True once an editor (or the independent author)
+        has approved the article for publication.
+    """
+
     title = models.CharField(max_length=200)
     content = models.TextField()
     # author is a journalist
@@ -84,6 +111,8 @@ class Article(models.Model):
 
 
 class Newsletter(models.Model):
+    """A journalist's newsletter that groups multiple articles."""
+
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True)
     author = models.ForeignKey(
