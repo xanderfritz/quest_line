@@ -2,7 +2,7 @@
 
 a django news application with a dark fantasy twist. journalists write articles, editors approve them, readers subscribe to their favourite publishers and journalists and get emailed when new approved articles drop. ships with a full REST API (token auth) and a dark souls style ui.
 
-built as the hyperiondev capstone project (M06T08).
+built as the hyperiondev capstone project (M06T08) and consolidated with sphinx documentation and a docker container in M07T05.
 
 ## features
 
@@ -15,8 +15,31 @@ built as the hyperiondev capstone project (M06T08).
 - rest api with DRF token auth
 - dark fantasy ui (Cinzel + EB Garamond fonts, parchment / gold on near black)
 - 21 passing automated unit tests covering roles, api, subscriptions, signals, mocks
+- sphinx generated html documentation in `docs/_build/html/`
+- docker container (sqlite based) for a one line demo deploy
 
-## setup
+## quickstart - docker (easiest)
+
+no mariadb needed, uses sqlite inside the container:
+
+```sh
+docker build -t quest_line:latest .
+docker run -p 8000:8000 --rm quest_line:latest
+```
+
+open http://localhost:8000/
+
+override settings with env flags if you want:
+
+```sh
+docker run -p 8000:8000 \
+  -e SECRET_KEY="your-real-key" \
+  -e DEBUG=False \
+  -e ALLOWED_HOSTS="yourhost.com" \
+  --rm quest_line:latest
+```
+
+## full setup - venv + mariadb
 
 ### 1. mariadb
 
@@ -37,16 +60,20 @@ the second grant lets the django test runner create its test database.
 ```sh
 python3 -m venv venv
 source venv/bin/activate
-pip install django djangorestframework requests mysqlclient
+pip install -r requirements.txt
 ```
 
-if mysqlclient fails to build, use the pure python driver (the project falls back automatically):
+### 3. env file
+
+copy the example and tweak if you need to change db creds:
 
 ```sh
-pip install pymysql
+cp .env.example .env
 ```
 
-### 3. migrate and run
+the app reads env vars via `os.environ` with safe dev defaults, so this is optional for local dev.
+
+### 4. migrate and run
 
 ```sh
 python manage.py migrate
@@ -55,6 +82,35 @@ python manage.py runserver
 ```
 
 open http://127.0.0.1:8000/
+
+## env vars
+
+| var | purpose | default |
+| --- | ------- | ------- |
+| SECRET_KEY | django secret key | insecure dev key (change in prod) |
+| DEBUG | django debug mode | True |
+| ALLOWED_HOSTS | comma separated hosts | empty |
+| DB_ENGINE | `mysql` or `sqlite` | mysql |
+| DB_NAME | db name | quest_line |
+| DB_USER | db user | quest_line |
+| DB_PASSWORD | db password | quest_line |
+| DB_HOST | db host | localhost |
+| DB_PORT | db port | empty |
+
+## documentation
+
+html docs live at `docs/_build/html/index.html` - just open it in a browser. generated with sphinx + the read the docs theme, pulling docstrings from the chronicle app.
+
+to regenerate after code changes:
+
+```sh
+source venv/bin/activate
+pip install sphinx sphinx-rtd-theme
+sphinx-apidoc -o docs chronicle/ --separate
+cd docs
+make clean
+make html
+```
 
 ## roles
 
@@ -119,6 +175,10 @@ python manage.py test chronicle
 - signal fires on approval (mocked email + mocked requests.post)
 - success + failure cases
 
+## secrets
+
+no real secrets live in this repo. the `SECRET_KEY` default in `settings.py` is a dev placeholder - override with the `SECRET_KEY` env var in production. the `.env` file is gitignored. use `.env.example` as a template.
+
 ## layout
 
 - `quest_line/` project settings and root urls
@@ -135,4 +195,8 @@ python manage.py test chronicle
   - `tests.py` automated unit tests
   - `templates/` html templates
   - `static/` css
+- `docs/` sphinx config, source and built html
 - `Planning/` design docs (requirements, api design, sequence diagram, ui plan)
+- `Dockerfile` + `.dockerignore` - sqlite based container
+- `requirements.txt` - pip deps
+- `.env.example` - env var template
