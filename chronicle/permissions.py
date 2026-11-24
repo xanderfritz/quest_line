@@ -1,16 +1,31 @@
+"""Permission classes for the chronicle API.
+
+ArticlePermission enforces the role-based rules on the article endpoints.
+"""
+
 from rest_framework.permissions import BasePermission, SAFE_METHODS
 
 
-# helper - is this user in the named group
 def in_group(user, name):
+    """Check if a user belongs to the named group.
+
+    :param user: The user to check.
+    :param str name: The group name.
+    :returns: True if the user is authenticated and in the group.
+    :rtype: bool
+    """
     return user.is_authenticated and user.groups.filter(name=name).exists()
 
 
-# api permission for articles
-# GET: any logged in user
-# POST: journalist only
-# PUT / DELETE: editors any, journalists only their own
 class ArticlePermission(BasePermission):
+    """Role-based permission for article endpoints.
+
+    - GET: any authenticated user
+    - POST: journalists only
+    - PUT / DELETE: editors on any article, journalists only on their own
+    """
+
+
     def has_permission(self, request, view):
         if not request.user.is_authenticated:
             return False
