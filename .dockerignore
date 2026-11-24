@@ -1,0 +1,17 @@
+# keep the docker build context small
+
+.git
+.venv
+venv
+env
+.env
+__pycache__
+*.pyc
+*.pyo
+db.sqlite3
+/static/
+docs/_build
+Planning
+README.md
+.gitignore
+.DS_Store
