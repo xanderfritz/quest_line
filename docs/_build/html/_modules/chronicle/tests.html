@@ -1,0 +1,495 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>chronicle.tests &mdash; quest_line 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=8d563738"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            quest_line
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">chronicle</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">quest_line</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">chronicle.tests</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for chronicle.tests</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">unittest.mock</span><span class="w"> </span><span class="kn">import</span> <span class="n">patch</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib.auth.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Group</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">mail</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.test</span><span class="w"> </span><span class="kn">import</span> <span class="n">TestCase</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.urls</span><span class="w"> </span><span class="kn">import</span> <span class="n">reverse</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rest_framework.authtoken.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Token</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rest_framework.test</span><span class="w"> </span><span class="kn">import</span> <span class="n">APIClient</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Article</span><span class="p">,</span> <span class="n">Newsletter</span><span class="p">,</span> <span class="n">Publisher</span><span class="p">,</span> <span class="n">User</span>
+
+
+<span class="c1"># helper - add a user to a group</span>
+<div class="viewcode-block" id="put_in_group">
+<a class="viewcode-back" href="../../chronicle.tests.html#chronicle.tests.put_in_group">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">put_in_group</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+    <span class="n">group</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">Group</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get_or_create</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+    <span class="n">user</span><span class="o">.</span><span class="n">groups</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">group</span><span class="p">)</span></div>
+
+
+
+<span class="c1"># shared setup - users + publisher + articles reused by most tests</span>
+<div class="viewcode-block" id="BaseSetup">
+<a class="viewcode-back" href="../../chronicle.tests.html#chronicle.tests.BaseSetup">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">BaseSetup</span><span class="p">(</span><span class="n">TestCase</span><span class="p">):</span>
+<div class="viewcode-block" id="BaseSetup.setUpTestData">
+<a class="viewcode-back" href="../../chronicle.tests.html#chronicle.tests.BaseSetup.setUpTestData">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setUpTestData</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">publisher</span> <span class="o">=</span> <span class="n">Publisher</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">'fantasy press'</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s1">'news of the realms'</span><span class="p">)</span>
+
+        <span class="bp">cls</span><span class="o">.</span><span class="n">reader</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create_user</span><span class="p">(</span>
+            <span class="n">username</span><span class="o">=</span><span class="s1">'reader1'</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s1">'pass12345'</span><span class="p">,</span> <span class="n">email</span><span class="o">=</span><span class="s1">'reader@test.com'</span><span class="p">,</span> <span class="n">role</span><span class="o">=</span><span class="n">User</span><span class="o">.</span><span class="n">READER</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">put_in_group</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">reader</span><span class="p">,</span> <span class="s1">'Reader'</span><span class="p">)</span>
+
+        <span class="bp">cls</span><span class="o">.</span><span class="n">journalist</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create_user</span><span class="p">(</span>
+            <span class="n">username</span><span class="o">=</span><span class="s1">'scribe1'</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s1">'pass12345'</span><span class="p">,</span> <span class="n">email</span><span class="o">=</span><span class="s1">'scribe@test.com'</span><span class="p">,</span> <span class="n">role</span><span class="o">=</span><span class="n">User</span><span class="o">.</span><span class="n">JOURNALIST</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">put_in_group</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">journalist</span><span class="p">,</span> <span class="s1">'Journalist'</span><span class="p">)</span>
+
+        <span class="bp">cls</span><span class="o">.</span><span class="n">other_journalist</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create_user</span><span class="p">(</span>
+            <span class="n">username</span><span class="o">=</span><span class="s1">'scribe2'</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s1">'pass12345'</span><span class="p">,</span> <span class="n">email</span><span class="o">=</span><span class="s1">'scribe2@test.com'</span><span class="p">,</span> <span class="n">role</span><span class="o">=</span><span class="n">User</span><span class="o">.</span><span class="n">JOURNALIST</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">put_in_group</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">other_journalist</span><span class="p">,</span> <span class="s1">'Journalist'</span><span class="p">)</span>
+
+        <span class="bp">cls</span><span class="o">.</span><span class="n">editor</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create_user</span><span class="p">(</span>
+            <span class="n">username</span><span class="o">=</span><span class="s1">'editor1'</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s1">'pass12345'</span><span class="p">,</span> <span class="n">email</span><span class="o">=</span><span class="s1">'editor@test.com'</span><span class="p">,</span> <span class="n">role</span><span class="o">=</span><span class="n">User</span><span class="o">.</span><span class="n">EDITOR</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">put_in_group</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">editor</span><span class="p">,</span> <span class="s1">'Editor'</span><span class="p">)</span>
+
+        <span class="c1"># one approved article and one pending, both by the journalist</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">approved_article</span> <span class="o">=</span> <span class="n">Article</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">title</span><span class="o">=</span><span class="s1">'dragons in the north'</span><span class="p">,</span>
+            <span class="n">content</span><span class="o">=</span><span class="s1">'they have returned'</span><span class="p">,</span>
+            <span class="n">author</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">journalist</span><span class="p">,</span>
+            <span class="n">publisher</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">publisher</span><span class="p">,</span>
+            <span class="n">approved</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">pending_article</span> <span class="o">=</span> <span class="n">Article</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">title</span><span class="o">=</span><span class="s1">'pending news'</span><span class="p">,</span>
+            <span class="n">content</span><span class="o">=</span><span class="s1">'in review'</span><span class="p">,</span>
+            <span class="n">author</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">journalist</span><span class="p">,</span>
+            <span class="n">publisher</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">publisher</span><span class="p">,</span>
+            <span class="n">approved</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="p">)</span></div>
+</div>
+
+
+
+<span class="c1"># model tests</span>
+
+<div class="viewcode-block" id="ModelTests">
+<a class="viewcode-back" href="../../chronicle.tests.html#chronicle.tests.ModelTests">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ModelTests</span><span class="p">(</span><span class="n">BaseSetup</span><span class="p">):</span>
+<div class="viewcode-block" id="ModelTests.test_user_role_set">
+<a class="viewcode-back" href="../../chronicle.tests.html#chronicle.tests.ModelTests.test_user_role_set">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_user_role_set</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reader</span><span class="o">.</span><span class="n">role</span><span class="p">,</span> <span class="s1">'reader'</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">journalist</span><span class="o">.</span><span class="n">role</span><span class="p">,</span> <span class="s1">'journalist'</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">role</span><span class="p">,</span> <span class="s1">'editor'</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ModelTests.test_non_reader_cannot_keep_subscriptions">
+<a class="viewcode-back" href="../../chronicle.tests.html#chronicle.tests.ModelTests.test_non_reader_cannot_keep_subscriptions">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_non_reader_cannot_keep_subscriptions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># a reader can have subs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reader</span><span class="o">.</span><span class="n">subscriptions_publishers</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">publisher</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reader</span><span class="o">.</span><span class="n">subscriptions_publishers</span><span class="o">.</span><span class="n">count</span><span class="p">(),</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="c1"># flipping to journalist should clear them on save</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reader</span><span class="o">.</span><span class="n">role</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">JOURNALIST</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reader</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reader</span><span class="o">.</span><span class="n">subscriptions_publishers</span><span class="o">.</span><span class="n">count</span><span class="p">(),</span> <span class="mi">0</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ModelTests.test_newsletter_m2m_articles">
+<a class="viewcode-back" href="../../chronicle.tests.html#chronicle.tests.ModelTests.test_newsletter_m2m_articles">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_newsletter_m2m_articles</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">Newsletter</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s1">'weekly'</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s1">'w'</span><span class="p">,</span> <span class="n">author</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">journalist</span><span class="p">)</span>
+        <span class="n">n</span><span class="o">.</span><span class="n">articles</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">approved_article</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertIn</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">approved_article</span><span class="p">,</span> <span class="n">n</span><span class="o">.</span><span class="n">articles</span><span class="o">.</span><span class="n">all</span><span class="p">())</span></div>
+</div>
+
+
+
+<span class="c1"># api - anonymous access</span>
+
+<div class="viewcode-block" id="ApiAnonTests">
+<a class="viewcode-back" href="../../chronicle.tests.html#chronicle.tests.ApiAnonTests">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ApiAnonTests</span><span class="p">(</span><span class="n">BaseSetup</span><span class="p">):</span>
+<div class="viewcode-block" id="ApiAnonTests.setUp">
+<a class="viewcode-back" href="../../chronicle.tests.html#chronicle.tests.ApiAnonTests.setUp">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span> <span class="o">=</span> <span class="n">APIClient</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="ApiAnonTests.test_anonymous_cannot_list_articles">
+<a class="viewcode-back" href="../../chronicle.tests.html#chronicle.tests.ApiAnonTests.test_anonymous_cannot_list_articles">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_anonymous_cannot_list_articles</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">reverse</span><span class="p">(</span><span class="s1">'api_article_list'</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">401</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ApiAnonTests.test_anonymous_cannot_create">
+<a class="viewcode-back" href="../../chronicle.tests.html#chronicle.tests.ApiAnonTests.test_anonymous_cannot_create">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_anonymous_cannot_create</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">reverse</span><span class="p">(</span><span class="s1">'api_article_list'</span><span class="p">),</span> <span class="p">{</span><span class="s1">'title'</span><span class="p">:</span> <span class="s1">'x'</span><span class="p">,</span> <span class="s1">'content'</span><span class="p">:</span> <span class="s1">'y'</span><span class="p">})</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">401</span><span class="p">)</span></div>
+</div>
+
+
+
+<span class="c1"># api - token exchange</span>
+
+<div class="viewcode-block" id="ApiTokenTests">
+<a class="viewcode-back" href="../../chronicle.tests.html#chronicle.tests.ApiTokenTests">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ApiTokenTests</span><span class="p">(</span><span class="n">BaseSetup</span><span class="p">):</span>
+<div class="viewcode-block" id="ApiTokenTests.test_token_login_success">
+<a class="viewcode-back" href="../../chronicle.tests.html#chronicle.tests.ApiTokenTests.test_token_login_success">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_token_login_success</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">client</span> <span class="o">=</span> <span class="n">APIClient</span><span class="p">()</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">reverse</span><span class="p">(</span><span class="s1">'api_token'</span><span class="p">),</span> <span class="p">{</span><span class="s1">'username'</span><span class="p">:</span> <span class="s1">'reader1'</span><span class="p">,</span> <span class="s1">'password'</span><span class="p">:</span> <span class="s1">'pass12345'</span><span class="p">})</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertIn</span><span class="p">(</span><span class="s1">'token'</span><span class="p">,</span> <span class="n">r</span><span class="o">.</span><span class="n">data</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ApiTokenTests.test_token_login_failure">
+<a class="viewcode-back" href="../../chronicle.tests.html#chronicle.tests.ApiTokenTests.test_token_login_failure">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_token_login_failure</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">client</span> <span class="o">=</span> <span class="n">APIClient</span><span class="p">()</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">reverse</span><span class="p">(</span><span class="s1">'api_token'</span><span class="p">),</span> <span class="p">{</span><span class="s1">'username'</span><span class="p">:</span> <span class="s1">'reader1'</span><span class="p">,</span> <span class="s1">'password'</span><span class="p">:</span> <span class="s1">'wrong'</span><span class="p">})</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">400</span><span class="p">)</span></div>
+</div>
+
+
+
+<span class="c1"># api - role gated access to articles</span>
+
+<div class="viewcode-block" id="ApiArticleAccessTests">
+<a class="viewcode-back" href="../../chronicle.tests.html#chronicle.tests.ApiArticleAccessTests">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ApiArticleAccessTests</span><span class="p">(</span><span class="n">BaseSetup</span><span class="p">):</span>
+    <span class="c1"># make an authed api client for a user</span>
+<div class="viewcode-block" id="ApiArticleAccessTests.auth_client">
+<a class="viewcode-back" href="../../chronicle.tests.html#chronicle.tests.ApiArticleAccessTests.auth_client">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">auth_client</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user</span><span class="p">):</span>
+        <span class="n">token</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">Token</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get_or_create</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">user</span><span class="p">)</span>
+        <span class="n">client</span> <span class="o">=</span> <span class="n">APIClient</span><span class="p">()</span>
+        <span class="n">client</span><span class="o">.</span><span class="n">credentials</span><span class="p">(</span><span class="n">HTTP_AUTHORIZATION</span><span class="o">=</span><span class="sa">f</span><span class="s1">'Token </span><span class="si">{</span><span class="n">token</span><span class="o">.</span><span class="n">key</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">client</span></div>
+
+
+<div class="viewcode-block" id="ApiArticleAccessTests.test_reader_can_list_approved_only">
+<a class="viewcode-back" href="../../chronicle.tests.html#chronicle.tests.ApiArticleAccessTests.test_reader_can_list_approved_only">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_reader_can_list_approved_only</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">client</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">auth_client</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reader</span><span class="p">)</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">reverse</span><span class="p">(</span><span class="s1">'api_article_list'</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+        <span class="n">titles</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span><span class="p">[</span><span class="s1">'title'</span><span class="p">]</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">r</span><span class="o">.</span><span class="n">data</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertIn</span><span class="p">(</span><span class="s1">'dragons in the north'</span><span class="p">,</span> <span class="n">titles</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNotIn</span><span class="p">(</span><span class="s1">'pending news'</span><span class="p">,</span> <span class="n">titles</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ApiArticleAccessTests.test_reader_cannot_create">
+<a class="viewcode-back" href="../../chronicle.tests.html#chronicle.tests.ApiArticleAccessTests.test_reader_cannot_create">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_reader_cannot_create</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">client</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">auth_client</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reader</span><span class="p">)</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">reverse</span><span class="p">(</span><span class="s1">'api_article_list'</span><span class="p">),</span> <span class="p">{</span>
+            <span class="s1">'title'</span><span class="p">:</span> <span class="s1">'reader post'</span><span class="p">,</span>
+            <span class="s1">'content'</span><span class="p">:</span> <span class="s1">'nope'</span><span class="p">,</span>
+            <span class="s1">'publisher'</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">publisher</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+        <span class="p">})</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">403</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ApiArticleAccessTests.test_journalist_can_create">
+<a class="viewcode-back" href="../../chronicle.tests.html#chronicle.tests.ApiArticleAccessTests.test_journalist_can_create">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_journalist_can_create</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">client</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">auth_client</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">journalist</span><span class="p">)</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">reverse</span><span class="p">(</span><span class="s1">'api_article_list'</span><span class="p">),</span> <span class="p">{</span>
+            <span class="s1">'title'</span><span class="p">:</span> <span class="s1">'new quest'</span><span class="p">,</span>
+            <span class="s1">'content'</span><span class="p">:</span> <span class="s1">'fresh ink'</span><span class="p">,</span>
+            <span class="s1">'publisher'</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">publisher</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+        <span class="p">})</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">201</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">Article</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s1">'new quest'</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="ApiArticleAccessTests.test_journalist_cannot_edit_other_journalists_article">
+<a class="viewcode-back" href="../../chronicle.tests.html#chronicle.tests.ApiArticleAccessTests.test_journalist_cannot_edit_other_journalists_article">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_journalist_cannot_edit_other_journalists_article</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">client</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">auth_client</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">other_journalist</span><span class="p">)</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">put</span><span class="p">(</span>
+            <span class="n">reverse</span><span class="p">(</span><span class="s1">'api_article_detail'</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">approved_article</span><span class="o">.</span><span class="n">id</span><span class="p">]),</span>
+            <span class="p">{</span><span class="s1">'title'</span><span class="p">:</span> <span class="s1">'hijacked'</span><span class="p">},</span>
+            <span class="nb">format</span><span class="o">=</span><span class="s1">'json'</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">403</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ApiArticleAccessTests.test_editor_can_delete_any_article">
+<a class="viewcode-back" href="../../chronicle.tests.html#chronicle.tests.ApiArticleAccessTests.test_editor_can_delete_any_article">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_editor_can_delete_any_article</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">client</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">auth_client</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="p">)</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">reverse</span><span class="p">(</span><span class="s1">'api_article_detail'</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">approved_article</span><span class="o">.</span><span class="n">id</span><span class="p">]))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">204</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="n">Article</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">approved_article</span><span class="o">.</span><span class="n">id</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">())</span></div>
+</div>
+
+
+
+<span class="c1"># api - subscribed feed</span>
+
+<div class="viewcode-block" id="ApiSubscribedTests">
+<a class="viewcode-back" href="../../chronicle.tests.html#chronicle.tests.ApiSubscribedTests">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ApiSubscribedTests</span><span class="p">(</span><span class="n">BaseSetup</span><span class="p">):</span>
+<div class="viewcode-block" id="ApiSubscribedTests.auth_client">
+<a class="viewcode-back" href="../../chronicle.tests.html#chronicle.tests.ApiSubscribedTests.auth_client">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">auth_client</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user</span><span class="p">):</span>
+        <span class="n">token</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">Token</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get_or_create</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">user</span><span class="p">)</span>
+        <span class="n">client</span> <span class="o">=</span> <span class="n">APIClient</span><span class="p">()</span>
+        <span class="n">client</span><span class="o">.</span><span class="n">credentials</span><span class="p">(</span><span class="n">HTTP_AUTHORIZATION</span><span class="o">=</span><span class="sa">f</span><span class="s1">'Token </span><span class="si">{</span><span class="n">token</span><span class="o">.</span><span class="n">key</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">client</span></div>
+
+
+<div class="viewcode-block" id="ApiSubscribedTests.test_subscribed_returns_only_subscribed">
+<a class="viewcode-back" href="../../chronicle.tests.html#chronicle.tests.ApiSubscribedTests.test_subscribed_returns_only_subscribed">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_subscribed_returns_only_subscribed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># reader subs to our publisher</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reader</span><span class="o">.</span><span class="n">subscriptions_publishers</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">publisher</span><span class="p">)</span>
+        <span class="c1"># another publisher with an article that should NOT show</span>
+        <span class="n">other</span> <span class="o">=</span> <span class="n">Publisher</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">'other press'</span><span class="p">)</span>
+        <span class="n">Article</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">title</span><span class="o">=</span><span class="s1">'unrelated'</span><span class="p">,</span>
+            <span class="n">content</span><span class="o">=</span><span class="s1">'x'</span><span class="p">,</span>
+            <span class="n">author</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">journalist</span><span class="p">,</span>
+            <span class="n">publisher</span><span class="o">=</span><span class="n">other</span><span class="p">,</span>
+            <span class="n">approved</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">client</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">auth_client</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reader</span><span class="p">)</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">reverse</span><span class="p">(</span><span class="s1">'api_articles_subscribed'</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+        <span class="n">titles</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span><span class="p">[</span><span class="s1">'title'</span><span class="p">]</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">r</span><span class="o">.</span><span class="n">data</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertIn</span><span class="p">(</span><span class="s1">'dragons in the north'</span><span class="p">,</span> <span class="n">titles</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNotIn</span><span class="p">(</span><span class="s1">'unrelated'</span><span class="p">,</span> <span class="n">titles</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ApiSubscribedTests.test_subscribed_empty_when_no_subs">
+<a class="viewcode-back" href="../../chronicle.tests.html#chronicle.tests.ApiSubscribedTests.test_subscribed_empty_when_no_subs">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_subscribed_empty_when_no_subs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">client</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">auth_client</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reader</span><span class="p">)</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">reverse</span><span class="p">(</span><span class="s1">'api_articles_subscribed'</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="p">[])</span></div>
+</div>
+
+
+
+<span class="c1"># approval signal - should email subs + hit /api/approved/ on approval</span>
+
+<div class="viewcode-block" id="ApprovalSignalTests">
+<a class="viewcode-back" href="../../chronicle.tests.html#chronicle.tests.ApprovalSignalTests">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ApprovalSignalTests</span><span class="p">(</span><span class="n">BaseSetup</span><span class="p">):</span>
+<div class="viewcode-block" id="ApprovalSignalTests.setUp">
+<a class="viewcode-back" href="../../chronicle.tests.html#chronicle.tests.ApprovalSignalTests.setUp">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># reader subscribes to the author AND the publisher</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reader</span><span class="o">.</span><span class="n">subscriptions_journalists</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">journalist</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reader</span><span class="o">.</span><span class="n">subscriptions_publishers</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">publisher</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ApprovalSignalTests.test_approval_sends_email_and_posts_to_api">
+<a class="viewcode-back" href="../../chronicle.tests.html#chronicle.tests.ApprovalSignalTests.test_approval_sends_email_and_posts_to_api">[docs]</a>
+    <span class="nd">@patch</span><span class="p">(</span><span class="s1">'chronicle.signals.requests.post'</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_approval_sends_email_and_posts_to_api</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mock_post</span><span class="p">):</span>
+        <span class="n">article</span> <span class="o">=</span> <span class="n">Article</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">title</span><span class="o">=</span><span class="s1">'rise of the dark soul'</span><span class="p">,</span>
+            <span class="n">content</span><span class="o">=</span><span class="s1">'the ember flickers'</span><span class="p">,</span>
+            <span class="n">author</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">journalist</span><span class="p">,</span>
+            <span class="n">publisher</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">publisher</span><span class="p">,</span>
+            <span class="n">approved</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">mail</span><span class="o">.</span><span class="n">outbox</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">article</span><span class="o">.</span><span class="n">approved</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">article</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="c1"># email should have been sent</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">mail</span><span class="o">.</span><span class="n">outbox</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertIn</span><span class="p">(</span><span class="s1">'rise of the dark soul'</span><span class="p">,</span> <span class="n">mail</span><span class="o">.</span><span class="n">outbox</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">subject</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertIn</span><span class="p">(</span><span class="s1">'reader@test.com'</span><span class="p">,</span> <span class="n">mail</span><span class="o">.</span><span class="n">outbox</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to</span><span class="p">)</span>
+        <span class="c1"># /api/approved/ should have been POSTed to</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">mock_post</span><span class="o">.</span><span class="n">called</span><span class="p">)</span>
+        <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span> <span class="o">=</span> <span class="n">mock_post</span><span class="o">.</span><span class="n">call_args</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertIn</span><span class="p">(</span><span class="s1">'/api/approved/'</span><span class="p">,</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">'json'</span><span class="p">][</span><span class="s1">'title'</span><span class="p">],</span> <span class="s1">'rise of the dark soul'</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ApprovalSignalTests.test_no_signal_fired_when_already_approved">
+<a class="viewcode-back" href="../../chronicle.tests.html#chronicle.tests.ApprovalSignalTests.test_no_signal_fired_when_already_approved">[docs]</a>
+    <span class="nd">@patch</span><span class="p">(</span><span class="s1">'chronicle.signals.requests.post'</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_no_signal_fired_when_already_approved</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mock_post</span><span class="p">):</span>
+        <span class="c1"># saving an already approved article should NOT fire again</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">approved_article</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="s1">'edited'</span>
+        <span class="n">mail</span><span class="o">.</span><span class="n">outbox</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">approved_article</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">mail</span><span class="o">.</span><span class="n">outbox</span><span class="p">),</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="n">mock_post</span><span class="o">.</span><span class="n">called</span><span class="p">)</span></div>
+</div>
+
+
+
+<span class="c1"># editor view flow</span>
+
+<div class="viewcode-block" id="EditorViewTests">
+<a class="viewcode-back" href="../../chronicle.tests.html#chronicle.tests.EditorViewTests">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">EditorViewTests</span><span class="p">(</span><span class="n">BaseSetup</span><span class="p">):</span>
+<div class="viewcode-block" id="EditorViewTests.test_editor_can_access_queue">
+<a class="viewcode-back" href="../../chronicle.tests.html#chronicle.tests.EditorViewTests.test_editor_can_access_queue">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_editor_can_access_queue</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="s1">'editor1'</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s1">'pass12345'</span><span class="p">)</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">reverse</span><span class="p">(</span><span class="s1">'editor_queue'</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="EditorViewTests.test_journalist_cannot_access_queue">
+<a class="viewcode-back" href="../../chronicle.tests.html#chronicle.tests.EditorViewTests.test_journalist_cannot_access_queue">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_journalist_cannot_access_queue</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="s1">'scribe1'</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s1">'pass12345'</span><span class="p">)</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">reverse</span><span class="p">(</span><span class="s1">'editor_queue'</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">403</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="EditorViewTests.test_approving_via_view_fires_signal">
+<a class="viewcode-back" href="../../chronicle.tests.html#chronicle.tests.EditorViewTests.test_approving_via_view_fires_signal">[docs]</a>
+    <span class="nd">@patch</span><span class="p">(</span><span class="s1">'chronicle.signals.requests.post'</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_approving_via_view_fires_signal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mock_post</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="s1">'editor1'</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s1">'pass12345'</span><span class="p">)</span>
+        <span class="n">mail</span><span class="o">.</span><span class="n">outbox</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c1"># reader subs so we can confirm the email</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reader</span><span class="o">.</span><span class="n">subscriptions_journalists</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">journalist</span><span class="p">)</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">reverse</span><span class="p">(</span><span class="s1">'article_approve'</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">pending_article</span><span class="o">.</span><span class="n">id</span><span class="p">]))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">302</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pending_article</span><span class="o">.</span><span class="n">refresh_from_db</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pending_article</span><span class="o">.</span><span class="n">approved</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">mail</span><span class="o">.</span><span class="n">outbox</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">mock_post</span><span class="o">.</span><span class="n">called</span><span class="p">)</span></div>
+</div>
+
+
+
+<span class="c1"># newsletter views</span>
+
+<div class="viewcode-block" id="NewsletterTests">
+<a class="viewcode-back" href="../../chronicle.tests.html#chronicle.tests.NewsletterTests">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">NewsletterTests</span><span class="p">(</span><span class="n">BaseSetup</span><span class="p">):</span>
+<div class="viewcode-block" id="NewsletterTests.test_journalist_can_create_newsletter">
+<a class="viewcode-back" href="../../chronicle.tests.html#chronicle.tests.NewsletterTests.test_journalist_can_create_newsletter">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_journalist_can_create_newsletter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="s1">'scribe1'</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s1">'pass12345'</span><span class="p">)</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">reverse</span><span class="p">(</span><span class="s1">'newsletter_create'</span><span class="p">),</span> <span class="p">{</span>
+            <span class="s1">'title'</span><span class="p">:</span> <span class="s1">'weekly dispatch'</span><span class="p">,</span>
+            <span class="s1">'description'</span><span class="p">:</span> <span class="s1">'news of the week'</span><span class="p">,</span>
+            <span class="s1">'articles'</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">approved_article</span><span class="o">.</span><span class="n">id</span><span class="p">],</span>
+        <span class="p">})</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">302</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">Newsletter</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s1">'weekly dispatch'</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="NewsletterTests.test_reader_cannot_create_newsletter">
+<a class="viewcode-back" href="../../chronicle.tests.html#chronicle.tests.NewsletterTests.test_reader_cannot_create_newsletter">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_reader_cannot_create_newsletter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="s1">'reader1'</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s1">'pass12345'</span><span class="p">)</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">reverse</span><span class="p">(</span><span class="s1">'newsletter_create'</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">403</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Xander Fritz.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

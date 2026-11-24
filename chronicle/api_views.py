@@ -1,3 +1,10 @@
+"""REST API endpoints for the chronicle app.
+
+Token authenticated endpoints for listing, creating, updating and
+deleting articles, plus the subscribed-articles feed and the
+approved-article webhook.
+"""
+
 from django.db.models import Q
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
@@ -9,10 +16,15 @@ from .permissions import ArticlePermission
 from .serializers import ArticleSerializer
 
 
-# GET lists approved articles, POST lets a journalist make one
 @api_view(['GET', 'POST'])
 @permission_classes([ArticlePermission])
 def api_article_list(request):
+    """List approved articles (GET) or create a new article (POST, journalists only).
+
+    :returns: JSON response with articles list or the created article.
+    :rtype: rest_framework.response.Response
+    """
+
     if request.method == 'GET':
         articles = Article.objects.filter(approved=True)
         serializer = ArticleSerializer(articles, many=True)
@@ -25,10 +37,16 @@ def api_article_list(request):
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-# get, update or delete one article
 @api_view(['GET', 'PUT', 'DELETE'])
 @permission_classes([ArticlePermission])
 def api_article_detail(request, pk):
+    """Get, update or delete a single article by primary key.
+
+    :param int pk: Primary key of the article.
+    :returns: The article, the updated article, or 204 on delete.
+    :rtype: rest_framework.response.Response
+    """
+
     try:
         article = Article.objects.get(pk=pk)
     except Article.DoesNotExist:
@@ -52,10 +70,15 @@ def api_article_detail(request, pk):
     return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-# articles from the readers subbed publishers and journalists
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def api_articles_subscribed(request):
+    """Return approved articles from publishers and journalists the reader follows.
+
+    :returns: JSON list of articles.
+    :rtype: rest_framework.response.Response
+    """
+
     user = request.user
     pub_ids = user.subscriptions_publishers.values_list('id', flat=True)
     jour_ids = user.subscriptions_journalists.values_list('id', flat=True)
@@ -65,9 +88,14 @@ def api_articles_subscribed(request):
     return Response(ArticleSerializer(articles, many=True).data)
 
 
-# the signal posts here after an article gets approved
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def api_approved_log(request):
+    """Internal webhook that logs approved articles posted by the signal handler.
+
+    :returns: JSON echo of the received data.
+    :rtype: rest_framework.response.Response
+    """
+
     print('[api/approved]', request.data)
     return Response({'logged': True, 'data': request.data}, status=status.HTTP_200_OK)

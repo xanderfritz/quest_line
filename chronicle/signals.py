@@ -1,3 +1,9 @@
+"""Signal handlers for article approval side effects.
+
+When an article is approved for the first time, subscribers are emailed
+and the article is logged to the internal approved-articles endpoint.
+"""
+
 import requests
 
 from django.conf import settings
@@ -8,9 +14,14 @@ from django.dispatch import receiver
 from .models import Article
 
 
-# save the old approved value before the save so we can tell if it flipped
 @receiver(pre_save, sender=Article)
 def cache_old_approved(sender, instance, **kwargs):
+    """Cache the previous approved value on the instance before saving.
+
+    :param sender: The model class (Article).
+    :param Article instance: The article about to be saved.
+    """
+
     if instance.pk:
         try:
             old = sender.objects.get(pk=instance.pk)
@@ -21,9 +32,14 @@ def cache_old_approved(sender, instance, **kwargs):
         instance._old_approved = False
 
 
-# when article gets approved, email subscribers and log to /api/approved/
 @receiver(post_save, sender=Article)
 def on_article_approved(sender, instance, created, **kwargs):
+    """Fire side effects when an article flips from unapproved to approved.
+
+    :param Article instance: The article that was just saved.
+    :param bool created: True if the article was newly created.
+    """
+
     old = getattr(instance, '_old_approved', False)
     if instance.approved and not old:
         send_email_to_subscribers(instance)
@@ -31,7 +47,12 @@ def on_article_approved(sender, instance, created, **kwargs):
 
 
 def send_email_to_subscribers(article):
+    """Email every reader subscribed to the author or publisher of the article.
+
+    :param Article article: The approved article.
+    """
     # grab everyone subbed to this journalist or publisher
+
     emails = set()
     for u in article.author.reader_fans.all():
         if u.email:
@@ -58,7 +79,12 @@ def send_email_to_subscribers(article):
 
 
 def post_to_approved_api(article):
+    """POST the approved article to the internal approved-articles endpoint.
+
+    :param Article article: The approved article.
+    """
     # log the approved article to our own api endpoint
+
     try:
         requests.post(
             settings.APPROVED_ENDPOINT,
