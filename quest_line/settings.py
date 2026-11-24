@@ -10,22 +10,29 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.1/ref/settings/
 """
 
+import os
 from pathlib import Path
+
+# use pymysql as a drop-in for mysqlclient so no c build is needed
+try:
+    import pymysql
+    pymysql.install_as_MySQLdb()
+except ImportError:
+    pass
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/6.1/howto/deployment/checklist/
+# pull settings from env vars, with dev defaults where safe
+SECRET_KEY = os.environ.get(
+    'SECRET_KEY',
+    'django-insecure-xi&=1ym%ix9w=*_-a^(pm%!_w_n-rg7d^88(4e-nk2jh5)%1&)'
+)
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-xi&=1ym%ix9w=*_-a^(pm%!_w_n-rg7d^88(4e-nk2jh5)%1&)'
+DEBUG = os.environ.get('DEBUG', 'True').lower() in ('true', '1', 'yes')
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [h.strip() for h in os.environ.get('ALLOWED_HOSTS', '').split(',') if h.strip()]
 
 
 # Application definition
@@ -75,19 +82,28 @@ WSGI_APPLICATION = 'quest_line.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.1/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'quest_line',
-        'USER': 'quest_line',
-        'PASSWORD': 'quest_line',
-        'HOST': 'localhost',
-        'PORT': '',
-        'OPTIONS': {
-            'charset': 'utf8mb4',
-        },
+# pick db engine with DB_ENGINE env var (sqlite or mysql). defaults to mysql for local dev
+if os.environ.get('DB_ENGINE', 'mysql') == 'sqlite':
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': os.environ.get('DB_NAME', 'quest_line'),
+            'USER': os.environ.get('DB_USER', 'quest_line'),
+            'PASSWORD': os.environ.get('DB_PASSWORD', 'quest_line'),
+            'HOST': os.environ.get('DB_HOST', 'localhost'),
+            'PORT': os.environ.get('DB_PORT', ''),
+            'OPTIONS': {
+                'charset': 'utf8mb4',
+            },
+        }
+    }
 
 
 # custom user model
